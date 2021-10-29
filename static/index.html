@@ -30,6 +30,8 @@ var host = window.location.host;
 var context = canvas.getContext("2d");
 var W = canvas.width  = window.innerWidth-6;
 var H = canvas.height = window.innerHeight-50;
+var star = new Image();
+star.src = "https://www.seekpng.com/png/full/169-1691050_star-shape-star-with-black-background.png";
 
 
 function sendJSONXMLHTTPRequest(url, objects, callback) {
@@ -40,16 +42,25 @@ function sendJSONXMLHTTPRequest(url, objects, callback) {
                 if (xhr.status==200) {
                     //XXX: parse some JSON from the request!
                     //XXX: Pass the data to the callback!
+
+                    parse_data = JSON.parse(xhr.responseText);
+                    callback(parse_data);
                 }
             } 
             catch(e) {
-                alert('Error: ' + e.name);
+
+                alert('Error: ' + e.name + "  " + e);
+
             }
         }
     };
     //XXX: POST to a URL
+    xhr.open('POST', url)
     //XXX: set the mimetype and the accept headers!
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    xhr.setRequestHeader('Accept', 'application/json');
     // Remember to use application/json !
+    xhr.send(JSON.stringify(objects));
 }
 
 
@@ -65,7 +76,8 @@ function drawCircle(context,entity) {
         //moveTo(x,y);
         fillStyle = entity["colour"];
         strokeStyle = fillStyle;
-        arc(x, y, (entity["radius"])?entity["radius"]:50, 0, 2.0 * Math.PI, false);  
+        context.drawImage(star, x, y, 40, 40);
+        // arc(x, y, (entity["radius"])?entity["radius"]:50, 0, 2.0 * Math.PI, false);  
         stroke();                                
     }
 }
@@ -138,6 +150,7 @@ function addEntity(entity, data) {
     world[entity] = data;
     drawNextFrame(); // (but should we?)
     //XXX: Send a XHTML Request that updates the entity you just  modified!
+    sendJSONXMLHTTPRequest('/entity/' + entity, world[entity], function (c){});
 
 }
 
@@ -262,7 +275,11 @@ mouse.mousedraggers.push(function(x,y,clicked,e) {
 
 function update() {
     //XXX: TODO Get the world from the webservice using a XMLHTTPRequest
-    drawFrame();
+    sendJSONXMLHTTPRequest('/world',null,function (new_world){
+        world = new_world;
+        drawNextFrame();
+        drawFrame();
+    });
 }
 
 // 30 frames per second
