@@ -96,7 +96,7 @@ def world():
         world_json = flask_post_json()
         if world_json != None:
             for key in world_json:
-                myWorld.set(key, world_json)
+                myWorld.set(key, world_json[key])
         return flask.jsonify(myWorld.world())
 
 @app.route("/entity/<entity>")    
