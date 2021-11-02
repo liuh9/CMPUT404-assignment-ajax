@@ -12,6 +12,6 @@ Contributors / Licensing
 
 Generally everything is LICENSE'D under the Apache 2 license by Abram Hindle.
 
-Hao Liu updated the code
+Hao Liu updated the code.
 
 
